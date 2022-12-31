@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "todolist"
+version = "0.1.0"
+description = "todolist start les33"
+authors = ["MrLerich <mrlerich@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.1.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
