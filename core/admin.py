@@ -7,6 +7,7 @@ from core.models import User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
+    '''Создаёт админку '''
     list_display = ('username', 'email', 'first_name', 'last_name')     # поля которые видим
     search_fields = ('username', 'email', 'first_name', 'last_name')
     readonly_fields = ('last_login', 'date_joined')
