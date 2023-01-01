@@ -2,9 +2,10 @@ from pathlib import Path
 
 from envparse import env
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-#нужно указать откуда брать переменные
+# нужно указать откуда брать переменные
 if (env_path := BASE_DIR.joinpath('.env')) and env_path.is_file():
     env.read_envfile(env_path)
 # Quick-start development settings - unsuitable for production
@@ -27,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # my apps
     'core',
 ]
 
