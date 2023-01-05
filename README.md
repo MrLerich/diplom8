@@ -3,7 +3,7 @@
 ### Stack
 - Django
 - Postgres
--
+- Python
 ### Как запустить проект в среде разработки
 - Создать виртуальную среду poetry install
 - Установить зависимости poetry shell
