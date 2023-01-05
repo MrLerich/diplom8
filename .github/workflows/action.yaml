@@ -1,5 +1,6 @@
 name: Build and deploy action todolist
-on: [push]
+on:
+  - push
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
