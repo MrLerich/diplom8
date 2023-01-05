@@ -14,10 +14,9 @@ WORKDIR /todolist
 #RUN pip install -r requirements.txt
 
 # Copy only requirements to cache them in docker layer
-COPY poetry.lock pyproject.toml /todolist/
 
 RUN python3 pip install "poetry==1.3.1"
-
+COPY poetry.lock pyproject.toml /todolist/
 # Project initialization:
 RUN poetry config virtualenvs.create false \
     && poetry install --no-dev --no-interaction --no-ansi --no-root
