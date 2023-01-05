@@ -45,7 +45,7 @@ services:
     command: >
       sh -c "python3 manage.py migrate"
   db:
-    image: postgres:14.6-alpine
+    image: postgres:15.1-alpine
     restart: on-failure
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -55,8 +55,6 @@ services:
       - ./pg_data:/var/lib/postgresql/data
     ports:
       - '${POSTGRES_PORT:-5432}:5432'
-    networks:
-      - default
     healthcheck:
       test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
       interval: 5s
