@@ -1,4 +1,4 @@
-name: Build and deploy action todolist
+name: CI
 on:
   - push
 jobs:
