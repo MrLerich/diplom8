@@ -45,7 +45,7 @@ services:
     command: >
       sh -c "python3 manage.py migrate"
   db:
-    image: postgres:15.1-alpine
+    image: postgres:14.6-alpine
     restart: on-failure
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
