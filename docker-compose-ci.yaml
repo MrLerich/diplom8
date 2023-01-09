@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   front:
-    image: sermalenk/skypro-front:lesson-35
+    image: sermalenk/skypro-front:lesson-36
     ports:
       - "80:80"
     depends_on:
@@ -26,7 +26,6 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
-
   migrations:
     image: mrlerich/diplom:$GITHUB_REF_NAME-$GITHUB_RUN_ID
     environment:

@@ -212,6 +212,21 @@ files = [
 Django = ">=3.2"
 
 [[package]]
+name = "django-filter"
+version = "22.1"
+description = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "django-filter-22.1.tar.gz", hash = "sha256:ed473b76e84f7e83b2511bb2050c3efb36d135207d0128dfe3ae4b36e3594ba5"},
+    {file = "django_filter-22.1-py3-none-any.whl", hash = "sha256:ed429e34760127e3520a67f415bec4c905d4649fbe45d0d6da37e6ff5e0287eb"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[[package]]
 name = "djangorestframework"
 version = "3.14.0"
 description = "Web APIs for Django, made easy."
@@ -226,6 +241,28 @@ files = [
 [package.dependencies]
 django = ">=3.0"
 pytz = "*"
+
+[[package]]
+name = "djangorestframework-jsonapi"
+version = "6.0.0"
+description = "A Django REST framework API adapter for the JSON:API spec."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "djangorestframework-jsonapi-6.0.0.tar.gz", hash = "sha256:f2465b1b1cd3f372abacc8d99f82835643373f4f3f12965276ad1ccc2d110415"},
+    {file = "djangorestframework_jsonapi-6.0.0-py2.py3-none-any.whl", hash = "sha256:a93b3678bd5e2f070946ca32d7d0bb3734cb5966a80f8a44fa721fcf15cf89ce"},
+]
+
+[package.dependencies]
+django = ">=3.2,<4.2"
+djangorestframework = ">=3.13,<3.15"
+inflection = ">=0.5.0"
+
+[package.extras]
+django-filter = ["django-filter (>=2.4)"]
+django-polymorphic = ["django-polymorphic (>=3.0)"]
+openapi = ["pyyaml (>=5.4)", "uritemplate (>=3.0.1)"]
 
 [[package]]
 name = "envparse"
@@ -251,6 +288,18 @@ python-versions = ">=3.5"
 files = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
     {file = "idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
+]
+
+[[package]]
+name = "inflection"
+version = "0.5.1"
+description = "A port of Ruby on Rails inflector to Python"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "inflection-0.5.1-py2.py3-none-any.whl", hash = "sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2"},
+    {file = "inflection-0.5.1.tar.gz", hash = "sha256:1a29730d366e996aaacffb2f1f1cb9593dc38e2ddd30c91250c6dde09ea9b417"},
 ]
 
 [[package]]
@@ -540,4 +589,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "51220eac756e9e971c648d8a950a23671fd2c795f28ac78598bd7a7dea748eca"
+content-hash = "8fdf0418f85b1376cb7b6f1d9e88df65333e5e5a5cc0fb818a32f9b27acfacbe"
