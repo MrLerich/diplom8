@@ -24,6 +24,8 @@ jobs:
       POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
       POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      SOCIAL_AUTH_VK_OAUTH2_KEY: ${{ secrets.SOCIAL_AUTH_VK_OAUTH2_KEY }}
+      SOCIAL_AUTH_VK_OAUTH2_SECRET: ${{ secrets.SOCIAL_AUTH_VK_OAUTH2_SECRET }}
     steps:
     - name: checkout clone code
       uses: actions/checkout@v2
