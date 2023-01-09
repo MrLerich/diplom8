@@ -15,6 +15,7 @@ django-cors-headers = "^3.13.0"
 social-auth-app-django = "^5.0.0"
 djangorestframework-jsonapi = "^6.0.0"
 django-filter = "^22.1"
+django-social-oauth-token = "^2.2.0"
 
 
 [tool.poetry.group.dev.dependencies]

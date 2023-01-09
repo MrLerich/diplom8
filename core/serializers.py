@@ -78,3 +78,11 @@ class UpdatePasswordSerializer(serializers.Serializer):
         instance.password = make_password(validated_data['new_password'])  # создаем новый пароль
         instance.save()  # тут уже его сохраняем
         return instance
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model: Type[AbstractBaseUser] = USER_MODEL
+        fields: list[str] = ['id', 'username', 'first_name', 'last_name', 'email']
+
