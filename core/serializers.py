@@ -54,7 +54,6 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     '''возвращает нужные нам поля из нашей USER_MODEL'''
-
     class Meta:
         model: Type[AbstractBaseUser] = USER_MODEL
         fields: list[str] = ['id', 'username', 'first_name', 'last_name', 'email']
