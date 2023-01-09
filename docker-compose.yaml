@@ -12,7 +12,6 @@ services:
       context: .
       dockerfile: Dockerfile
     image: mrlerich/diplom
-    restart: always
     env_file:
       - .env
     depends_on:
@@ -20,8 +19,8 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
-    ports:
-      - "8000:8000"
+#    ports:
+#      - "8000:8000"
 #    volumes:
 #      - ./.env:/todolist/.env
   migrations:
@@ -39,7 +38,6 @@ services:
       sh -c "python3 manage.py migrate"
   db:
     image: postgres:15.1-alpine
-    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -50,8 +48,8 @@ services:
       - ./pg_data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
-#    networks:
-#      - default
+    networks:
+      - default
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
