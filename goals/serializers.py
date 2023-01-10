@@ -1,5 +1,5 @@
-from rest_framework import serializers
 
+from rest_framework import serializers
 
 from core.serializers import UserSerializer
 from goals.models import GoalCategory, Goal, GoalComment
@@ -7,10 +7,20 @@ from goals.models import GoalCategory, Goal, GoalComment
 
 class GoalCategoryCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = GoalCategory
         read_only_fields = ('id', 'created', 'updated', 'user')
         fields = '__all__'
+
+    def validate_category(self, value):
+        if value.is_deleted:
+            raise serializers.ValidationError("not allowed in deleted category")
+
+        if value.user != self.context["request"].user:
+            raise serializers.ValidationError("not owner of category")
+
+        return value
 
 
 class GoalCategorySerializer(serializers.ModelSerializer):
@@ -33,8 +43,8 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         if value.is_deleted:
             raise serializers.ValidationError('не допускается в удаленной категории')
 
-        if value.user != self.context['request'].user:
-            raise serializers.ValidationError('пользователь не создатель данной категории')
+        # if value.user != self.context['request'].user:
+        #     raise serializers.ValidationError('пользователь не создатель данной категории')
 
         return value
 
@@ -47,12 +57,12 @@ class GoalSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'created', 'updated', 'user')
         fields = '__all__'
 
-    def validate_category(self, value):
-
-        if value.user != self.context["request"].user:
-            raise serializers.ValidationError("not owner of category")
-
-        return value
+    # def validate_category(self, value):
+    #
+    #     if value.user != self.context["request"].user:
+    #         raise serializers.ValidationError("not owner of category")
+    #
+    #     return value
 
 
 class GoalCommentCreateSerializer(serializers.ModelSerializer):
