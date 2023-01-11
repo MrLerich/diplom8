@@ -5,7 +5,7 @@ jobs:
   build_and_push:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout (clone code)
+    - name: clone code
       uses: actions/checkout@v3
     - name: docker build
       run: docker build -t ${{ secrets.IMAGE_TAG }}:$GITHUB_REF_NAME-$GITHUB_RUN_ID .
@@ -14,8 +14,8 @@ jobs:
     - name: docker push
       run: docker push ${{ secrets.IMAGE_TAG }}:$GITHUB_REF_NAME-$GITHUB_RUN_ID
   deploy:
-    needs: build_and_push
     runs-on: ubuntu-latest
+    needs: build_and_push
     env:
       DEBUG: ${{ secrets.DEBUG }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
@@ -27,18 +27,18 @@ jobs:
       SOCIAL_AUTH_VK_OAUTH2_KEY: ${{ secrets.SOCIAL_AUTH_VK_OAUTH2_KEY }}
       SOCIAL_AUTH_VK_OAUTH2_SECRET: ${{ secrets.SOCIAL_AUTH_VK_OAUTH2_SECRET }}
     steps:
-    - name: checkout clone code
+    - name: clone code
       uses: actions/checkout@v3
     - name: render configs
       run: |
         mkdir deploy
         cat docker-compose-ci.yaml | envsubst > deploy/docker-compose.yaml
-    - name: copy file to server
+    - name: copy files to server
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
-        password: ${{secrets.SERVER_PASSWORD }}
+        password: ${{ secrets.SERVER_PASSWORD }}
         source: "deploy/docker-compose.yaml"
         target: "todolist"
         strip_components: 1
@@ -47,7 +47,7 @@ jobs:
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
-        password: ${{secrets.SERVER_PASSWORD }}
+        password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd todolist
           echo ${{ secrets.SERVER_PASSWORD }} | docker-compose down

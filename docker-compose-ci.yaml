@@ -1,54 +1,58 @@
-version: '3.8'
+version: '3.9'
 
 services:
   front:
     image: sermalenk/skypro-front:lesson-36
-    ports:
-      - "80:80"
     depends_on:
       - api
+    ports:
+      - "80:80"
+
   api:
     image: mrlerich/diplom:$GITHUB_REF_NAME-$GITHUB_RUN_ID
+    restart: always
     environment:
       DEBUG: ${DEBUG}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_HOST: ${POSTGRES_HOST}
       SECRET_KEY: ${SECRET_KEY}
       SOCIAL_AUTH_VK_OAUTH2_KEY: ${SOCIAL_AUTH_VK_OAUTH2_KEY}
       SOCIAL_AUTH_VK_OAUTH2_SECRET: ${SOCIAL_AUTH_VK_OAUTH2_SECRET}
-#    ports:
-#      - "8000:8000"
+    #    ports:
+    #      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
+    ports:
+      - "8000:8000"
   migrations:
     image: mrlerich/diplom:$GITHUB_REF_NAME-$GITHUB_RUN_ID
     environment:
-      DEBUG: ${DEBUG}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_HOST: ${POSTGRES_HOST}
       SECRET_KEY: ${SECRET_KEY}
       SOCIAL_AUTH_VK_OAUTH2_KEY: ${SOCIAL_AUTH_VK_OAUTH2_KEY}
       SOCIAL_AUTH_VK_OAUTH2_SECRET: ${SOCIAL_AUTH_VK_OAUTH2_SECRET}
     depends_on:
       db:
         condition: service_healthy
-    command: python manage.py migrate
+    command: >
+        sh -c "python3 manage.py migrate"
   db:
     image: postgres:15.1-alpine
-    restart: on-failure
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    restart: always
     volumes:
       - ./pg_data:/var/lib/postgresql/data
     ports:
