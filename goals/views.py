@@ -1,27 +1,27 @@
+from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, filters, permissions
 from rest_framework.pagination import LimitOffsetPagination
 
 from goals.filters import GoalDateFilter
-from goals.models import GoalCategory, Goal, GoalComment
-from goals.serializers import GoalCategorySerializer, GoalCategoryCreateSerializer, GoalCreateSerializer, \
-    GoalSerializer, GoalCommentCreateSerializer, GoalCommentSerializer
+from goals.models import GoalCategory, Goal, GoalComment, Board
+from goals.permissions import GoalPermissions, BoardPermissions, GoalCategoryPermissions, \
+    GoalCommentPermissions
+from goals import serializers
 
 
 # GoalCategory
-
 class GoalCategoryCreateView(generics.CreateAPIView):
     '''вьюшка создания категорий'''
     model = GoalCategory
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = GoalCategoryCreateSerializer
-
+    serializer_class = serializers.GoalCategoryCreateSerializer
+    permission_classes = [permissions.IsAuthenticated, GoalCategoryPermissions]
 
 class GoalCategoryListView(generics.ListAPIView):
-    '''вьюшка списка категорий'''
+    '''вьюшка списка категорий к которым у пользователя есть доступ'''
     model = GoalCategory
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = GoalCategorySerializer
+    serializer_class = serializers.GoalCategorySerializer
     pagination_class = LimitOffsetPagination
     filter_backends = [
         filters.OrderingFilter,
@@ -29,42 +29,48 @@ class GoalCategoryListView(generics.ListAPIView):
     ]
     ordering_fields = ['title', 'created']
     ordering = ['title']
-    search_fields = ['title']
-
+    search_fields = ['title', 'board']
+    #пользователь должен видеть не только те категории,
+    # которые создал сам, но и другие, в досках которых он является участником.
     def get_queryset(self):
-        return GoalCategory.objects.filter(
-            user=self.request.user, is_deleted=False
-        )
+        '''метод возвращает из базы queryset списка категорий к которым у пользователя есть доступ'''
+        return GoalCategory.objects.filter(board__participants__user=self.request.user,
+                                           is_deleted=False)
 
 
 class GoalCategoryView(generics.RetrieveUpdateDestroyAPIView):
-    '''вьюшка просмотра и удаления категорий'''
+    '''вьюшка для отображения, редактирования и удаления категории к которым у пользователя есть доступ'''
     model = GoalCategory
-    serializer_class = GoalCategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.GoalCategorySerializer
+    permission_classes = [permissions.IsAuthenticated, GoalCategoryPermissions]
 
     def get_queryset(self):
-        return GoalCategory.objects.filter(user=self.request.user, is_deleted=False)
+        '''метод возвращает из базы queryset категории к которым у пользователя есть доступ'''
+        return GoalCategory.objects.filter(board__participants__user=self.request.user,
+                                           is_deleted=False)
 
-    def perform_destroy(self, instance):
+    def perform_destroy(self, instance: GoalCategory):
+        """метод удаляет категорию, а у всех целей в этой категории меняет статус на архивный"""
+        # with transaction.atomic():
         instance.is_deleted = True
-        instance.save()
+        instance.save()     #update_fields=('is_deleted',)
+        # Goal.objects.filter(category=instance).update(status=Goal.Status.archived)
         return instance
-
 
 # Goals
 class GoalCreateView(generics.CreateAPIView):
     '''вьюшка создания цели'''
     model = Goal
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = GoalCreateSerializer
+    permission_classes = [permissions.IsAuthenticated, GoalPermissions]
+    serializer_class = serializers.GoalCreateSerializer
 
 
 class GoalListView(generics.ListAPIView):
     '''вьюшка списка целей'''
     model = Goal
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = GoalSerializer
+    pagination_class = LimitOffsetPagination
+    serializer_class = serializers.GoalSerializer
     filter_backends = [
         DjangoFilterBackend,
         filters.OrderingFilter,
@@ -72,40 +78,47 @@ class GoalListView(generics.ListAPIView):
     ]
     filterset_class = GoalDateFilter
     ordering_fields = ['title', 'created']
-    ordering = ['title']
-    search_fields = ['title']
+    ordering = ['title', 'due_date']
+    search_fields = ['title', 'description']
 
     def get_queryset(self):
-        return Goal.objects.filter(user=self.request.user).exclude(status=Goal.Status.archived)
-
+        '''возвращает из базы queryset списка целей к которым у пользователя есть доступ'''
+        return Goal.objects.filter(
+            category__board__participants__user=self.request.user
+        ).exclude(status=Goal.Status.archived)
+        # return Goal.objects.select_related('user', 'category__board').filter(
+        #     Q(category__board__participants__user_id=self.request.user.id) & ~Q(status=Goal.Status.archived)
+        # )
 
 class GoalView(generics.RetrieveUpdateDestroyAPIView):
-    '''вьюшка просмотра и удаления цели'''
+    '''вьюшка просмотра, редактирования и удаления цели к которым у пользователя есть доступ'''
     model = Goal
-    serializer_class = GoalSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.GoalSerializer
+    permission_classes = [permissions.IsAuthenticated, GoalPermissions]
 
     def get_queryset(self):
-        return Goal.objects.filter(user=self.request.user)
+        '''возвращает из базы queryset цели к которому у пользователя есть доступ'''
+        return Goal.objects.filter(category__board__participants__user=self.request.user)
 
     def perform_destroy(self, instance):
+        '''меняет статус цели как архивный'''
         instance.status = Goal.Status.archived  # не удаляем саму сущность
-        instance.save()
+        instance.save()     #update_fields=('status',)
         return instance
+
 
 # GoalComment
 class GoalCommentCreateView(generics.CreateAPIView):
     '''вьюшка создания комментария к цели'''
     model = GoalComment
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = GoalCommentCreateSerializer
-
+    serializer_class = serializers.GoalCommentCreateSerializer
+    permission_classes = [permissions.IsAuthenticated, GoalCommentPermissions]
 
 class GoalCommentListView(generics.ListAPIView):
     '''вьюшка списка комментариев'''
     model = GoalComment
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = GoalCommentSerializer
+    permission_classes = [permissions.IsAuthenticated]  #, GoalCommentPermissions
+    serializer_class = serializers.GoalCommentSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = [DjangoFilterBackend,
                        filters.OrderingFilter,
@@ -114,14 +127,60 @@ class GoalCommentListView(generics.ListAPIView):
     ordering = ['-created']
 
     def get_queryset(self):
-        return GoalComment.objects.filter(user=self.request.user)
+        '''возвращает из базы queryset списка комментариев к которым у пользователя есть доступ'''
+        return GoalComment.objects.filter(goal__category__board__participants__user=self.request.user)
 
 
 class GoalCommentView(generics.RetrieveUpdateDestroyAPIView):
-    '''вьюшка просмотра комментария'''
+    '''вьюшка просмотра, редактирования и удаления комментария к которым у пользователя есть доступ'''
     model = GoalComment
-    serializer_class = GoalCommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.GoalCommentSerializer
+    permission_classes = [permissions.IsAuthenticated, GoalCommentPermissions]
 
     def get_queryset(self):
-        return GoalComment.objects.filter(user=self.request.user)
+        '''возвращает из базы queryset комментария к которому у пользователя есть доступ'''
+        return GoalComment.objects.filter(goal__category__board__participants__user=self.request.user)
+
+
+#Board
+class BoardCreateView(generics.CreateAPIView):
+    '''вьюшка создания доски'''
+    model = Board
+    permissions = [permissions.IsAuthenticated]
+    serializer_class = serializers.BoardCreateSerializer
+
+
+class BoardView(generics.RetrieveUpdateDestroyAPIView):
+    '''вьюшка просмотра, редактирования и удаления доски к которой у пользователя есть доступ'''
+    model = Board
+    permission_classes = [permissions.IsAuthenticated, BoardPermissions]
+    serializer_class = serializers.BoardSerializer
+
+    def get_queryset(self):
+        '''возвращает из базы queryset доски к которой у пользователя есть доступ'''
+        # Обратите внимание на фильтрацию – она идет через participants
+        return Board.objects.filter(participants__user=self.request.user, is_deleted=False)
+
+    def perform_destroy(self, instance: Board):
+        '''удаляет доску, и все категории и цели в ней'''
+        # При удалении доски помечаем ее как is_deleted, «удаляем» категории,
+        # обновляем статус целей
+        with transaction.atomic():
+            instance.is_deleted = True
+            instance.save() #update_fields=['is_deleted']
+            instance.categories.update(is_deleted=True)
+            Goal.objects.filter(category__board=instance).update(status=Goal.Status.archived)
+        return instance
+
+
+class BoardListView(generics.ListAPIView):
+    '''вьюшка просмотра списков досок к которым у пользователя есть доступ'''
+    model = Board
+    permission_classes = [permissions.IsAuthenticated, BoardPermissions]
+    serializer_class = serializers.BoardListSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering = ['title']
+
+    def get_queryset(self):
+        '''возвращает из базы queryset списка досок к которым у пользователя есть доступ'''
+        return Board.objects.filter(participants__user=self.request.user, is_deleted=False)
