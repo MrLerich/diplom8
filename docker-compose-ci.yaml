@@ -21,6 +21,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       SOCIAL_AUTH_VK_OAUTH2_KEY: ${SOCIAL_AUTH_VK_OAUTH2_KEY}
       SOCIAL_AUTH_VK_OAUTH2_SECRET: ${SOCIAL_AUTH_VK_OAUTH2_SECRET}
+      TOKEN_TG_BOT: ${TOKEN_TG_BOT}
     #    ports:
     #      - "8000:8000"
     depends_on:
@@ -41,6 +42,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       SOCIAL_AUTH_VK_OAUTH2_KEY: ${SOCIAL_AUTH_VK_OAUTH2_KEY}
       SOCIAL_AUTH_VK_OAUTH2_SECRET: ${SOCIAL_AUTH_VK_OAUTH2_SECRET}
+      TOKEN_TG_BOT: ${TOKEN_TG_BOT}
     depends_on:
       db:
         condition: service_healthy
