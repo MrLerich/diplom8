@@ -21,7 +21,6 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       SOCIAL_AUTH_VK_OAUTH2_KEY: ${SOCIAL_AUTH_VK_OAUTH2_KEY}
       SOCIAL_AUTH_VK_OAUTH2_SECRET: ${SOCIAL_AUTH_VK_OAUTH2_SECRET}
-      TOKEN_TG_BOT: ${TOKEN_TG_BOT}
     #    ports:
     #      - "8000:8000"
     depends_on:
@@ -49,8 +48,6 @@ services:
         sh -c "python3 manage.py migrate"
   bot:
     image: mrlerich/diplom:$GITHUB_REF_NAME-$GITHUB_RUN_ID
-    environment:
-      TOKEN_TG_BOT: ${TOKEN_TG_BOT}
     command: >
       sh -c "python3 manage.py runbot"
     depends_on:
