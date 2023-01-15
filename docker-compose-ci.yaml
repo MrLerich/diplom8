@@ -52,9 +52,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always
-    env_file:
-      - .env
+    environment:
+      TOKEN_TG_BOT: ${TOKEN_TG_BOT}
     command: >
       sh -c "python3 manage.py runbot"
     depends_on:
