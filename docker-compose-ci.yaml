@@ -56,8 +56,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
+      api:
+        condition: service_started
   db:
     image: postgres:15.1-alpine
     environment:
