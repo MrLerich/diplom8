@@ -48,9 +48,7 @@ services:
     command: >
         sh -c "python3 manage.py migrate"
   bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: mrlerich/diplom:$GITHUB_REF_NAME-$GITHUB_RUN_ID
     environment:
       TOKEN_TG_BOT: ${TOKEN_TG_BOT}
     command: >
