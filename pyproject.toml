@@ -16,6 +16,8 @@ social-auth-app-django = "^5.0.0"
 djangorestframework-jsonapi = "^6.0.0"
 django-filter = "^22.1"
 django-social-oauth-token = "^2.2.0"
+marshmallow = "^3.19.0"
+marshmallow-dataclass = "^8.5.11"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   front:
-    image: sermalenk/skypro-front:lesson-37
+    image: sermalenk/skypro-front:lesson-38
     depends_on:
       - api
     ports:
@@ -46,6 +46,20 @@ services:
         condition: service_healthy
     command: >
         sh -c "python3 manage.py migrate"
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    command: >
+      sh -c "python3 manage.py runbot"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
   db:
     image: postgres:15.1-alpine
     environment:
