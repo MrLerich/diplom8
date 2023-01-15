@@ -3,7 +3,7 @@ on:
   - push
 jobs:
   build_and_push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: clone code
       uses: actions/checkout@v3
