@@ -13,7 +13,7 @@ class MessageFrom:
     is_bot: bool
     first_name: str | None
     last_name: str | None
-    username: str
+    # username: str
     # language_code: str | None
 
     class Meta:
