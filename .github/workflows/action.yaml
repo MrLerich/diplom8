@@ -26,6 +26,7 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       SOCIAL_AUTH_VK_OAUTH2_KEY: ${{ secrets.SOCIAL_AUTH_VK_OAUTH2_KEY }}
       SOCIAL_AUTH_VK_OAUTH2_SECRET: ${{ secrets.SOCIAL_AUTH_VK_OAUTH2_SECRET }}
+      TOKEN_TG_BOT: ${{ secrets.TOKEN_TG_BOT }}
     steps:
     - name: clone code
       uses: actions/checkout@v3
