@@ -1,8 +1,9 @@
 from django.contrib import admin
 
-from goals.models import GoalCategory, Goal, GoalComment
+from goals.models import Goal, GoalComment, GoalCategory
 
 
+@admin.register(GoalCategory)
 class GoalCategoryAdmin(admin.ModelAdmin):
     """Класс модели для корректного отображения категорий цели в админ панели"""
     list_display = ('title', 'user', 'created', 'updated')
@@ -29,7 +30,7 @@ class GoalCommentAdmin(admin.ModelAdmin):
     search_fields = ('text',)
     readonly_fields = ('created', 'updated')
 
-admin.site.register(GoalCategory, GoalCategoryAdmin)
-admin.site.register(Goal)
-admin.site.register(GoalComment)
-admin.site.register(Board)
+# admin.site.register(GoalCategory, GoalCategoryAdmin)
+# admin.site.register(Goal)
+# admin.site.register(GoalComment)
+# admin.site.register(Board)
