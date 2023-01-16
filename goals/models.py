@@ -53,7 +53,7 @@ class BoardParticipant(DatesModelMixin):
 
 
 class GoalCategory(DatesModelMixin):
-    '''Модель Категории для целей'''
+    """Модель Категории для целей"""
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
@@ -71,7 +71,7 @@ class GoalCategory(DatesModelMixin):
 
 
 class Goal(DatesModelMixin):
-    '''Модель Целей'''
+    """Модель Целей"""
     class Meta:
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
@@ -109,7 +109,7 @@ class Goal(DatesModelMixin):
         return self.title
 
 class GoalComment(DatesModelMixin):
-    '''Модель комментариев целей'''
+    """Модель комментариев целей"""
     class Meta:
         verbose_name = 'Комментарий к цели'
         verbose_name_plural = 'Комментарии к цели'
