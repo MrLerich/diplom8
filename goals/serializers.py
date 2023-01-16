@@ -1,5 +1,7 @@
+
 from django.db import transaction
 from rest_framework import serializers
+
 
 from core.models import User
 from core.serializers import UserSerializer
@@ -21,6 +23,14 @@ class BoardCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         '''метод для валидации данных и создания доски'''
         user = validated_data.pop('user')
+        board = Board.objects.filter(title=validated_data['title']).first()
+        if board:
+            raise serializers.ValidationError('Для этого пользователя доска с таким именем'
+                                              ' уже существует! Поменяйте название!')
+        # cat = GoalCategory.objects.filter(user=user, board=board, title=validated_data['title']).first()
+        # if cat:
+        #     raise serializers.ValidationError('Для этой доски пользователя категория '
+        #                                       ' уже существует! Поменяйте название!')
         board = Board.objects.create(**validated_data)
         BoardParticipant.objects.create(user=user,
                                         board=board,
@@ -109,6 +119,7 @@ class GoalCategoryCreateSerializer(serializers.ModelSerializer):
     def validate_board(self, value):
         '''Метод для валидации данных доски. Метод проверяет не удалена ли доска
                     и является ли пользователь участником с ролью owner или writer'''
+
         if value.is_deleted:
             raise serializers.ValidationError("not allowed in deleted board")
         if not BoardParticipant.objects.filter(
