@@ -33,6 +33,21 @@ class Command(BaseCommand):
         self.tg_client = TgClient(settings.TOKEN_TG_BOT)
         super().__init__(*args, **kwargs)
 
+    def handle(self, *args, **options):
+        """Ручка проверяет обновления чата. При получении новых сообщений от пользователей
+                отправляет их на ручку -> _main_logic()  - уже был в боте, _verify() - не был в боте"""
+        while True:
+            self._get_response()
+
+            if self.reply_required:
+                if self.user:
+                    reply = self._main_logic()
+                else:
+                    reply = self._verify()
+
+                self._send_reply(reply=reply)
+                self.reply_required = False
+
     def _get_response(self) -> None:
         """Ручка для получения ключевых данные из ответа"""
         # получить ключевые данные из ответа
@@ -61,12 +76,14 @@ class Command(BaseCommand):
         - /create -> позволяет создавать новые цели
         - /cancel -> позволяет отменить создание цели (только на этапе создания)"""
 
-        if self.category_mode:
+        if self.message == '/cancel':
+            reply = self._cancel()
+        elif self.category_mode:
             reply = self._choose_category()
         elif self.goal_mode:
             reply = self._create_goal()
         # key commands
-        elif self.message == '/start':
+        elif self.message == '/start' or self.message == '/help':
             reply: Any = 'Телеграм бот для просмотра и создания целей ' \
                          'на сайте http://larin.ga \n' \
                          ' Возможные команды: \n' \
@@ -79,16 +96,20 @@ class Command(BaseCommand):
             reply = self._goals()
         elif self.message == '/create':
             reply = self._create()
-        elif self.message == '/cancel':
-            self.category_mode = False
-            self.goal_mode = False
-            reply: Any = 'Текущая операция прервана, введите новую команду. \n' \
-                         '/start - стартовая информация для о боте \n' \
-                         '/goals - просмотр списка имеющихся целей \n' \
-                         '/create - создание цели в выбранной категории \n' \
-
+        elif self.message.startswith('/'):
+            reply = 'Неизвестная команда. Пока я так не умею :-('
         else:
             reply = 'Неизвестная команда'
+
+        return reply
+
+    def _cancel(self):
+        self.category_mode = False
+        self.goal_mode = False
+        reply: Any = 'Текущая операция прервана, введите новую команду. \n' \
+                      '/start - стартовая информация для о боте \n' \
+                      '/goals - просмотр списка имеющихся целей \n' \
+                      '/create - создание цели в выбранной категории \n'
 
         return reply
 
@@ -114,10 +135,12 @@ class Command(BaseCommand):
         goals = Goal.objects.filter(
             category__board__participants__user=self.user.user, category__is_deleted=False
         ).only('id', 'title').exclude(status=Goal.Status.archived).order_by('created')
-
-        prefix = ['Cписок ваших целей:']
-        reply = [f'Цель №{goal.id}  "{goal.title}" из категории {goal.category}' for goal in goals]
-        return prefix + reply
+        if goals.count() > 0:
+            prefix = ['Cписок ваших целей:']
+            reply = [f'Цель №{goal.id}  "{goal.title}" из категории {goal.category}' for goal in goals]
+            return prefix + reply
+        else:
+            return 'У вас еще нет записанных целей!'
 
     def _create(self) -> list:
         """Ручка для получения и вывода списка категорий целей"""
@@ -127,13 +150,21 @@ class Command(BaseCommand):
             is_deleted=False
         ).only('id', 'title')
         self.category_mode = True
-        prefix = ['Введите номер категории из списка доступных:']
-        reply = [f'#{category.id} {category.title}' for category in categories]
-        return prefix + reply
+        if categories.count() > 0:
+            prefix = ['Введите номер категории из списка доступных:']
+            reply = [f'#{category.id} {category.title}' for category in categories]
+            return prefix + reply
+        else:
+            reply = self._cancel()
+            prefix = 'У вас еще нет созданных категорий.' \
+                   'Создать категорию нужно на сайте: http://larin.ga/categories \n'
+            return prefix + reply
 
     def _choose_category(self) -> str:
         """Ручка для выбора и валидации выбранной категорий для создания новой цели"""
-
+        # if self.m cancel'):
+        #     self._cancel()
+        # else:
         if not self.message.isnumeric():
             return 'Выбрана неверная категория'
 
@@ -156,11 +187,14 @@ class Command(BaseCommand):
 
     def _create_goal(self) -> str:
         """Ручка для создания новой цели"""
+        # if self.message =='/cancel':
+        #     self._cancel()
+        # else:
         self.goal = Goal.objects.create(
             user=self.user.user, title=self.message, category=self.category
         )
         self.goal_mode = False
-        return f'Ваша цель №{self.goal.id}   {self.goal.title}   успешно создана:\n ' \
+        return f'Ваша цель №{self.goal.id}   "{self.goal.title}"   успешно создана:\n' \
                f'http://larin.ga/boards/{self.category.board.id}/goals?goal={self.goal.id}'
 
     def _send_reply(self, reply: str | list) -> None:
@@ -170,18 +204,3 @@ class Command(BaseCommand):
                 self.tg_client.send_message(chat_id=self.chat_id, text=item)
         else:
             self.tg_client.send_message(chat_id=self.chat_id, text=reply)
-
-    def handle(self, *args, **options):
-        """Ручка проверяет обновления чата. При получении новых сообщений от пользователей
-                отправляет их на ручку -> _main_logic()  - уже был в боте, _verify() - не был в боте"""
-        while True:
-            self._get_response()
-
-            if self.reply_required:
-                if self.user:
-                    reply = self._main_logic()
-                else:
-                    reply = self._verify()
-
-                self._send_reply(reply=reply)
-                self.reply_required = False

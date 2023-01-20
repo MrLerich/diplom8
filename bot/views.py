@@ -24,6 +24,7 @@ class VerificationView(GenericAPIView):
         tg_user.save(update_fields=('user',))
         tg_client = TgClient(settings.TOKEN_TG_BOT)
         instance_serializer: TgUserSerializer = self.get_serializer(tg_user)
-        tg_client.send_message(tg_user.tg_chat_id, 'Верификация прошла успешно! Введите /goals , '
+        tg_client.send_message(tg_user.tg_chat_id, 'Верификация прошла успешно! Введите /start для знакомства '
+                                                   'с возможностями бота или /goals , '
                                                    'чтобы увидеть список своих целей.')
         return Response(instance_serializer.data)
