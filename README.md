@@ -38,14 +38,7 @@
 - Вы можете скопировать переменные по умолчанию из todolist/.env.example
 - docker-compose up -d
 ### Запустить проект
-- python manage.py runserver
-- Создать пользователя-администратора
-- ./manage.py createsuperuser
-- установить значения и обязательные поля
-- Доступ к сайту администратора по адресу http://127.0.0.1:8000/admin/
+- перейти в папку todolist/ в которой есть docker-compose.yaml
+- выполнить команду запуска контейнеров: sudo docker-compose up -d
+- *** можно посмотреть статусы созданных контейнеров: sudo docker ps 
 
-### And run server:
-- Linux\MacOS: `python3 manage.py runserver`
-- Windows: `python manage.py runserver`
-
-Open **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**

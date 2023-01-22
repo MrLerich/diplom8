@@ -15,7 +15,6 @@ from goals.models import (
 
 class Command(BaseCommand):
     """Базовый класс для запуска и управления ботом"""
-    help = "run bot"
 
     def __init__(self, *args, **kwargs):
         self.response: GetUpdatesResponse
@@ -29,8 +28,8 @@ class Command(BaseCommand):
         self.reply_required: bool = False
         self.category_mode: bool = False
         self.goal_mode: bool = False
-        self.offset = 0
-        self.tg_client = TgClient(settings.TOKEN_TG_BOT)
+        self.offset: int = 0
+        self.tg_client: TgClient = TgClient(settings.TOKEN_TG_BOT)
         super().__init__(*args, **kwargs)
 
     def handle(self, *args, **options):
@@ -41,7 +40,7 @@ class Command(BaseCommand):
 
             if self.reply_required:
                 if self.user:
-                    reply = self._main_logic()
+                    reply: str = self._main_logic()
                 else:
                     reply = self._verify()
 
@@ -107,9 +106,9 @@ class Command(BaseCommand):
         self.category_mode = False
         self.goal_mode = False
         reply: Any = 'Текущая операция прервана, введите новую команду. \n' \
-                      '/start - стартовая информация для о боте \n' \
-                      '/goals - просмотр списка имеющихся целей \n' \
-                      '/create - создание цели в выбранной категории \n'
+                     '/start - стартовая информация для о боте \n' \
+                     '/goals - просмотр списка имеющихся целей \n' \
+                     '/create - создание цели в выбранной категории \n'
 
         return reply
 
@@ -137,7 +136,7 @@ class Command(BaseCommand):
         ).only('id', 'title').exclude(status=Goal.Status.archived).order_by('created')
         if goals.count() > 0:
             prefix = ['Cписок ваших целей:']
-            reply = [f'Цель №{goal.id}  "{goal.title}" из категории {goal.category}' for goal in goals]
+            reply: list[str] = [f'Цель №{goal.id}  "{goal.title}" из категории {goal.category}' for goal in goals]
             return prefix + reply
         else:
             return 'У вас еще нет записанных целей!'
@@ -155,16 +154,13 @@ class Command(BaseCommand):
             reply = [f'#{category.id} {category.title}' for category in categories]
             return prefix + reply
         else:
-            reply = self._cancel()
             prefix = 'У вас еще нет созданных категорий.' \
-                   'Создать категорию нужно на сайте: http://larin.ga/categories \n'
+                     'Создать категорию нужно на сайте: http://larin.ga/categories \n'
+            reply = self._cancel()
             return prefix + reply
 
     def _choose_category(self) -> str:
         """Ручка для выбора и валидации выбранной категорий для создания новой цели"""
-        # if self.m cancel'):
-        #     self._cancel()
-        # else:
         if not self.message.isnumeric():
             return 'Выбрана неверная категория'
 
@@ -187,9 +183,6 @@ class Command(BaseCommand):
 
     def _create_goal(self) -> str:
         """Ручка для создания новой цели"""
-        # if self.message =='/cancel':
-        #     self._cancel()
-        # else:
         self.goal = Goal.objects.create(
             user=self.user.user, title=self.message, category=self.category
         )

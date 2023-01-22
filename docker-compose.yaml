@@ -41,7 +41,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: on-failure
+#    restart: on-failure
     image: mrlerich/diplom
     env_file:
       - .env
