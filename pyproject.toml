@@ -20,6 +20,7 @@ pytelegrambotapi = "^4.9.0"
 marshmallow = "^3.19.0"
 marshmallow-dataclass = "^8.5.11"
 pydantic = "^1.10.4"
+django-pytest = "^0.2.0"
 
 
 [build-system]
