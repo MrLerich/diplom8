@@ -99,7 +99,6 @@ class Command(BaseCommand):
             reply = 'Неизвестная команда. Пока я так не умею :-('
         else:
             reply = 'Неизвестная команда'
-
         return reply
 
     def _cancel(self):
@@ -109,7 +108,6 @@ class Command(BaseCommand):
                      '/start - стартовая информация для о боте \n' \
                      '/goals - просмотр списка имеющихся целей \n' \
                      '/create - создание цели в выбранной категории \n'
-
         return reply
 
     def _verify(self) -> str:
@@ -126,7 +124,6 @@ class Command(BaseCommand):
         reply = (
             f"Подтвердите, пожалуйста, свой аккаунт.\n"
             f"Для подтверждения необходимо ввести код: {self.user.verification_code} на сайте http://larin.ga/auth ")
-
         return reply
 
     def _goals(self) -> list:
@@ -139,7 +136,8 @@ class Command(BaseCommand):
             reply: list[str] = [f'Цель №{goal.id}  "{goal.title}" из категории {goal.category}' for goal in goals]
             return prefix + reply
         else:
-            return 'У вас еще нет записанных целей!'
+            reply ='У вас еще нет записанных целей!'
+            return reply
 
     def _create(self) -> list:
         """Ручка для получения и вывода списка категорий целей"""
@@ -178,7 +176,6 @@ class Command(BaseCommand):
                      f'Введите цель')
             self.goal_mode = True
             self.category_mode = False
-
         return reply
 
     def _create_goal(self) -> str:
