@@ -49,8 +49,8 @@ class Command(BaseCommand):
 
     def _get_response(self) -> None:
         """Ручка для получения ключевых данные из ответа"""
-        # получить ключевые данные из ответа
-        self.response = self.tg_client.get_updates(offset=self.offset)
+
+        self.response = self.tg_client.get_updates(offset=self.offset)  # получить ключевые данные из ответа
 
         for item in self.response.result:
             self.offset = item.update_id + 1
