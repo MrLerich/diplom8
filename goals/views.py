@@ -25,14 +25,14 @@ from goals.permissions import (
 
 # GoalCategory
 class GoalCategoryCreateView(generics.CreateAPIView):
-    """вьюшка создания категорий"""
+    """Вьюшка создания категорий"""
     model = GoalCategory
     serializer_class = serializers.GoalCategoryCreateSerializer
     permission_classes = [permissions.IsAuthenticated, GoalCategoryPermissions]
 
 
 class GoalCategoryListView(generics.ListAPIView):
-    """вьюшка списка категорий к которым у пользователя есть доступ"""
+    """Вьюшка списка категорий к которым у пользователя есть доступ"""
     model = GoalCategory
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.GoalCategorySerializer
@@ -48,24 +48,24 @@ class GoalCategoryListView(generics.ListAPIView):
     # пользователь должен видеть не только те категории,
     # которые создал сам, но и другие, в досках которых он является участником.
     def get_queryset(self):
-        """метод возвращает из базы queryset списка категорий к которым у пользователя есть доступ"""
+        """Метод возвращает из базы queryset списка категорий к которым у пользователя есть доступ"""
         return GoalCategory.objects.filter(board__participants__user=self.request.user,
                                            is_deleted=False)
 
 
 class GoalCategoryView(generics.RetrieveUpdateDestroyAPIView):
-    """вьюшка для отображения, редактирования и удаления категории к которым у пользователя есть доступ"""
+    """Вьюшка для отображения, редактирования и удаления категории к которым у пользователя есть доступ"""
     model = GoalCategory
     serializer_class = serializers.GoalCategorySerializer
     permission_classes = [permissions.IsAuthenticated, GoalCategoryPermissions]
 
     def get_queryset(self):
-        """метод возвращает из базы queryset категории к которым у пользователя есть доступ"""
+        """Метод возвращает из базы queryset категории к которым у пользователя есть доступ"""
         return GoalCategory.objects.filter(board__participants__user=self.request.user,
                                            is_deleted=False)
 
     def perform_destroy(self, instance: GoalCategory):
-        """метод удаляет категорию, а у всех целей в этой категории меняет статус на архивный"""
+        """Метод удаляет категорию, а у всех целей в этой категории меняет статус на архивный"""
         # with transaction.atomic():
         instance.is_deleted = True
         instance.save()  # update_fields=('is_deleted',)
@@ -75,14 +75,14 @@ class GoalCategoryView(generics.RetrieveUpdateDestroyAPIView):
 
 # Goals
 class GoalCreateView(generics.CreateAPIView):
-    """вьюшка создания цели"""
+    """Вьюшка создания цели"""
     model = Goal
     permission_classes = [permissions.IsAuthenticated, GoalPermissions]
     serializer_class = serializers.GoalCreateSerializer
 
 
 class GoalListView(generics.ListAPIView):
-    """вьюшка списка целей"""
+    """Вьюшка списка целей"""
     model = Goal
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = LimitOffsetPagination
@@ -98,7 +98,7 @@ class GoalListView(generics.ListAPIView):
     search_fields = ['title', 'description']
 
     def get_queryset(self):
-        """возвращает из базы queryset списка целей к которым у пользователя есть доступ"""
+        """Возвращает из базы queryset списка целей к которым у пользователя есть доступ"""
         return Goal.objects.filter(
             category__board__participants__user=self.request.user
         ).exclude(status=Goal.Status.archived)
@@ -108,13 +108,13 @@ class GoalListView(generics.ListAPIView):
 
 
 class GoalView(generics.RetrieveUpdateDestroyAPIView):
-    """вьюшка просмотра, редактирования и удаления цели к которым у пользователя есть доступ"""
+    """Вьюшка просмотра, редактирования и удаления цели к которым у пользователя есть доступ"""
     model = Goal
     serializer_class = serializers.GoalSerializer
     permission_classes = [permissions.IsAuthenticated, GoalPermissions]
 
     def get_queryset(self):
-        """возвращает из базы queryset цели к которому у пользователя есть доступ"""
+        """Возвращает из базы queryset цели к которому у пользователя есть доступ"""
         return Goal.objects.filter(category__board__participants__user=self.request.user)
 
     def perform_destroy(self, instance):
@@ -126,14 +126,14 @@ class GoalView(generics.RetrieveUpdateDestroyAPIView):
 
 # GoalComment
 class GoalCommentCreateView(generics.CreateAPIView):
-    """вьюшка создания комментария к цели"""
+    """Вьюшка создания комментария к цели"""
     model = GoalComment
     serializer_class = serializers.GoalCommentCreateSerializer
     permission_classes = [permissions.IsAuthenticated, GoalCommentPermissions]
 
 
 class GoalCommentListView(generics.ListAPIView):
-    """вьюшка списка комментариев"""
+    """Вьюшка списка комментариев"""
     model = GoalComment
     permission_classes = [permissions.IsAuthenticated]  # , GoalCommentPermissions
     serializer_class = serializers.GoalCommentSerializer
@@ -145,42 +145,42 @@ class GoalCommentListView(generics.ListAPIView):
     ordering = ['-created']
 
     def get_queryset(self):
-        """возвращает из базы queryset списка комментариев к которым у пользователя есть доступ"""
+        """Возвращает из базы queryset списка комментариев к которым у пользователя есть доступ"""
         return GoalComment.objects.filter(goal__category__board__participants__user=self.request.user)
 
 
 class GoalCommentView(generics.RetrieveUpdateDestroyAPIView):
-    """вьюшка просмотра, редактирования и удаления комментария к которым у пользователя есть доступ"""
+    """Вьюшка просмотра, редактирования и удаления комментария к которым у пользователя есть доступ"""
     model = GoalComment
     serializer_class = serializers.GoalCommentSerializer
     permission_classes = [permissions.IsAuthenticated, GoalCommentPermissions]
 
     def get_queryset(self):
-        """возвращает из базы queryset комментария к которому у пользователя есть доступ"""
+        """Возвращает из базы queryset комментария к которому у пользователя есть доступ"""
         return GoalComment.objects.filter(goal__category__board__participants__user=self.request.user)
 
 
 # Board
 class BoardCreateView(generics.CreateAPIView):
-    """вьюшка создания доски"""
+    """Вьюшка создания доски"""
     model = Board
     permissions = [permissions.IsAuthenticated]
     serializer_class = serializers.BoardCreateSerializer
 
 
 class BoardView(generics.RetrieveUpdateDestroyAPIView):
-    """вьюшка просмотра, редактирования и удаления доски к которой у пользователя есть доступ"""
+    """Вьюшка просмотра, редактирования и удаления доски к которой у пользователя есть доступ"""
     model = Board
     permission_classes = [permissions.IsAuthenticated, BoardPermissions]
     serializer_class = serializers.BoardSerializer
 
     def get_queryset(self):
-        """возвращает из базы queryset доски к которой у пользователя есть доступ"""
+        """Возвращает из базы queryset доски к которой у пользователя есть доступ"""
         # Обратите внимание на фильтрацию – она идет через participants
         return Board.objects.filter(participants__user=self.request.user, is_deleted=False)
 
     def perform_destroy(self, instance: Board):
-        """удаляет доску, и все категории и цели в ней"""
+        """Удаляет доску, и все категории и цели в ней"""
         # При удалении доски помечаем ее как is_deleted, «удаляем» категории,
         # обновляем статус целей
         with transaction.atomic():
@@ -192,7 +192,7 @@ class BoardView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class BoardListView(generics.ListAPIView):
-    """вьюшка просмотра списков досок к которым у пользователя есть доступ"""
+    """Вьюшка просмотра списков досок к которым у пользователя есть доступ"""
     model = Board
     permission_classes = [permissions.IsAuthenticated, BoardPermissions]
     serializer_class = serializers.BoardListSerializer
@@ -200,5 +200,5 @@ class BoardListView(generics.ListAPIView):
     ordering = ['title']
 
     def get_queryset(self):
-        """возвращает из базы queryset списка досок к которым у пользователя есть доступ"""
+        """Возвращает из базы queryset списка досок к которым у пользователя есть доступ"""
         return Board.objects.filter(participants__user=self.request.user, is_deleted=False)

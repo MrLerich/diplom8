@@ -16,11 +16,13 @@ social-auth-app-django = "^5.0.0"
 djangorestframework-jsonapi = "^6.0.0"
 django-filter = "^22.1"
 django-social-oauth-token = "^2.2.0"
-pytelegrambotapi = "^4.9.0"
 marshmallow = "^3.19.0"
 marshmallow-dataclass = "^8.5.11"
 pydantic = "^1.10.4"
-django-pytest = "^0.2.0"
+pytest-factoryboy = "^2.5.1"
+pytest = "^7.2.1"
+pytest-django = "^4.5.2"
+factory-boy = "^3.2.1"
 
 
 [build-system]
