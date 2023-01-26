@@ -1,4 +1,7 @@
+from typing import Type
+
 import pytest
+from rest_framework.test import APIClient
 
 
 @pytest.fixture
@@ -8,3 +11,8 @@ def get_auth_client(client):
         return client
 
     return _get_auth_client
+
+
+@pytest.fixture()
+def client() -> APIClient:
+    return APIClient()

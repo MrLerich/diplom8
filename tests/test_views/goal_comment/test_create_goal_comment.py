@@ -1,14 +1,14 @@
 import pytest
+from django.urls import reverse
 
 
 @pytest.mark.django_db
 def test_goal_comment_create(
-    user_factory,
+    user,
     get_auth_client,
     board_participant_factory,
     goal_factory,
 ):
-    user = user_factory()
     board_participant = board_participant_factory(user=user)
     goal = goal_factory(user=user, category__board=board_participant.board)
 
@@ -18,11 +18,10 @@ def test_goal_comment_create(
     }
 
     auth_client = get_auth_client(user)
-
+    url = reverse('goal_comment_create')
     response = auth_client.post(
-        '/goals/goal_comment/create',
+        path=url,
         data=data,
-        content_type='application/json',
     )
 
     assert response.status_code == 201
@@ -40,13 +39,12 @@ def test_goal_comment_create(
 
 @pytest.mark.django_db
 def test_goal_comment_create_with_not_auth_user(
-    user_factory,
+    user,
     get_auth_client,
     board_participant_factory,
     goal_factory,
     client,
 ):
-    user = user_factory()
     board_participant = board_participant_factory(user=user)
     goal = goal_factory(user=user, category__board=board_participant.board)
 
@@ -54,12 +52,8 @@ def test_goal_comment_create_with_not_auth_user(
         'goal': goal.id,
         'text': 'test comment',
     }
-
-    response = client.post(
-        '/goals/goal/create',
-        data=data,
-        content_type='application/json',
-    )
+    url = reverse('goal_comment_create')
+    response = client.post(path=url, data=data)
 
     assert response.status_code == 403
     assert response.data == {

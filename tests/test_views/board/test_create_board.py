@@ -1,12 +1,13 @@
 import pytest
+from django.urls import reverse
 
 
 @pytest.mark.django_db
 def test_board_create(
-    user_factory,
+    user,
     get_auth_client,
 ):
-    user = user_factory()
+    url = reverse('board_create')
 
     data = {
         'title': 'test board',
@@ -14,11 +15,7 @@ def test_board_create(
 
     auth_client = get_auth_client(user)
 
-    response = auth_client.post(
-        '/goals/board/create',
-        data=data,
-        content_type='application/json',
-    )
+    response = auth_client.post(url, data=data)
 
     assert response.status_code == 201
 

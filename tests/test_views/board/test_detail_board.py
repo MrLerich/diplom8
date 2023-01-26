@@ -1,13 +1,12 @@
 import pytest
+from django.urls import reverse
 
 
 @pytest.mark.django_db
 def test_board_detail(
-    get_auth_client,
-    board_participant_factory,
+        get_auth_client,
+        board_participant,
 ):
-    board_participant = board_participant_factory()
-
     expected_response = {
         'id': board_participant.board.id,
         'title': board_participant.board.title,
@@ -35,8 +34,8 @@ def test_board_detail(
     }
 
     auth_client = get_auth_client(board_participant.user)
-
-    response = auth_client.get(f'/goals/board/{board_participant.board.id}')
+    url = reverse('board_detail', kwargs={'pk': board_participant.pk})
+    response = auth_client.get(path=url)
 
     assert response.status_code == 200
     assert response.data == expected_response
@@ -45,8 +44,8 @@ def test_board_detail(
 @pytest.mark.django_db
 def test_board_detail_with_not_auth_user(board_participant_factory, client):
     board_participant = board_participant_factory()
-
-    response = client.get(f'/goals/board/{board_participant.board.id}')
+    url = reverse('board_detail', kwargs={'pk': board_participant.pk})
+    response = client.get(path=url)
 
     assert response.status_code == 403
     assert response.data == {
@@ -56,17 +55,17 @@ def test_board_detail_with_not_auth_user(board_participant_factory, client):
 
 @pytest.mark.django_db
 def test_board_detail_with_another_auth_user(
-    user_factory,
-    get_auth_client,
-    board_participant_factory,
-    client,
+        user_factory,
+        get_auth_client,
+        board_participant,
+        client,
 ):
-    board_participant = board_participant_factory()
     user2 = user_factory()
 
     auth_client = get_auth_client(user2)
 
-    response = auth_client.get(f'/goals/board/{board_participant.board.id}')
+    url = reverse('board_detail', kwargs={'pk': board_participant.pk})
+    response = auth_client.get(path=url)
 
     assert response.status_code == 404
     assert response.data == {'detail': 'Not found.'}

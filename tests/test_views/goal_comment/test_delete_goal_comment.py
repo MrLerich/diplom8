@@ -1,14 +1,14 @@
 import pytest
+from django.urls import reverse
 
 
 @pytest.mark.django_db
 def test_goal_comment_delete(
-    user_factory,
+        user,
     get_auth_client,
     board_participant_factory,
     goal_comment_factory,
 ):
-    user = user_factory()
     board_participant = board_participant_factory(user=user)
     goal_comment = goal_comment_factory(
         goal__category__board=board_participant.board,
@@ -18,8 +18,8 @@ def test_goal_comment_delete(
     )
 
     auth_client = get_auth_client(user)
-
-    response = auth_client.delete(f'/goals/goal_comment/{goal_comment.id}')
+    url = reverse('goal_comment_detail', kwargs={'pk': goal_comment.pk})
+    response = auth_client.delete(path=url)
 
     assert response.status_code == 204
     assert response.data is None
@@ -43,8 +43,8 @@ def test_goal_comment_delete_with_another_auth_user(
     )
 
     auth_client = get_auth_client(user2)
-
-    response = auth_client.delete(f'/goals/goal_comment/{goal_comment.id}')
+    url = reverse('goal_comment_detail', kwargs={'pk': goal_comment.pk})
+    response = auth_client.delete(path=url)
 
     assert response.status_code == 404
     assert response.data == {'detail': 'Not found.'}

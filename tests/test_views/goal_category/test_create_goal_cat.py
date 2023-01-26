@@ -1,13 +1,13 @@
 import pytest
+from django.urls import reverse
 
 
 @pytest.mark.django_db
 def test_goal_category_create(
-    user_factory,
+    user,
     get_auth_client,
     board_participant_factory,
 ):
-    user = user_factory()
     board_participant = board_participant_factory(user=user)
 
     data = {
@@ -16,11 +16,10 @@ def test_goal_category_create(
     }
 
     auth_client = get_auth_client(user)
-
+    url = reverse('goal_category_create')
     response = auth_client.post(
-        '/goals/goal_category/create',
+        path=url,
         data=data,
-        content_type='application/json',
     )
 
     assert response.status_code == 201
@@ -51,11 +50,10 @@ def test_goal_category_create_with_not_auth_user(
         'board': board_participant.board.id,
         'title': 'test cat',
     }
-
+    url = reverse('goal_category_create')
     response = client.post(
-        '/goals/goal_category/create',
+        path=url,
         data=data,
-        content_type='application/json',
     )
 
     assert response.status_code == 403
